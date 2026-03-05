@@ -24,6 +24,8 @@ int main() {
 
         char opcode[8], rd[6], rs1[6], rs2[6], funct3[4], funct7[8];
 
+        //Opcode + Field Extraction (Implemented by Ishan)
+
         strncpy(opcode, instr + 25, 7); opcode[7] = '\0';
         strncpy(rd,     instr + 20, 5); rd[5] = '\0';
         strncpy(funct3, instr + 17, 3); funct3[3] = '\0';
@@ -38,8 +40,10 @@ int main() {
         int r2  = binToInt(rs2, 5);
         int f7  = binToInt(funct7, 7);
 
+        // R-Type Instruction Decoding (Implemented by Ishan)
+
         if (op == 0b0110011) {
-            char *name = "";
+            const char *name = "";
             if      (f3 == 0 && f7 == 0)  name = "add";
             else if (f3 == 0 && f7 == 32) name = "sub";
             else if (f3 == 7 && f7 == 0)  name = "and";
@@ -59,12 +63,16 @@ int main() {
             printf("Funct3: %d\n", f3);
             printf("Funct7: %d\n", f7);
 
+        //I-Type Instruction Decoding (Implemented by Ishan)
+
         } else if (op == 0b0010011 || op == 0b0000011 || op == 0b1100111) {
+
             char immBits[13];
             strncpy(immBits, instr, 12); immBits[12] = '\0';
             int immVal = signExtend(binToInt(immBits, 12), 12);
 
             char *name = "";
+
             if (op == 0b0010011) {
                 if      (f3 == 0) name = "addi";
                 else if (f3 == 7) name = "andi";
@@ -89,11 +97,15 @@ int main() {
             printf("Rd: x%d\n", rdN);
             printf("Immediate: %d (or 0x%X)\n", immVal, immVal & 0xFFF);
 
+       // S-Type Instruction Decoding (Implemented by Livy)
+
         } else if (op == 0b0100011) {
+
             char combined[13];
             strncpy(combined, instr, 7);
             strncpy(combined + 7, instr + 20, 5);
             combined[12] = '\0';
+
             int immVal = signExtend(binToInt(combined, 12), 12);
 
             char *name = "";
@@ -107,7 +119,10 @@ int main() {
             printf("Rs2: x%d\n", r2);
             printf("Immediate: %d (or 0x%X)\n", immVal, immVal & 0xFFF);
 
+        //SB-Type Instruction Decoding (Implemented by Livy)
+
         } else if (op == 0b1100011) {
+
             char combined[14];
             combined[0]  = instr[0];
             combined[1]  = instr[24];
@@ -115,6 +130,7 @@ int main() {
             strncpy(combined + 8, instr + 20, 4);
             combined[12] = '0';
             combined[13] = '\0';
+
             int immVal = signExtend(binToInt(combined, 13), 13);
 
             char *name = "";
@@ -129,7 +145,10 @@ int main() {
             printf("Rs2: x%d\n", r2);
             printf("Immediate: %d\n", immVal);
 
+       // UJ-Type Instruction Decoding (Implemented by Livy)
+
         } else if (op == 0b1101111) {
+
             char combined[22];
             combined[0]  = instr[0];
             strncpy(combined + 1, instr + 12, 8);
@@ -137,6 +156,7 @@ int main() {
             strncpy(combined + 10, instr + 1, 10);
             combined[20] = '0';
             combined[21] = '\0';
+
             int immVal = signExtend(binToInt(combined, 21), 21);
 
             printf("Instruction Type : UJ\n");
